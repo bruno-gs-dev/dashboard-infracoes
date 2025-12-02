@@ -226,37 +226,35 @@
             <!-- GRADE DE DESTAQUES (2x2) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 1. MAIOR PAGADOR (Sponsor) -->
-                <div class="sponsor-card rounded-xl p-5 relative overflow-hidden group h-80">
+                <div class="sponsor-card rounded-xl p-5 relative overflow-hidden group h-80 flex flex-col items-center justify-center text-center">
                     <div class="absolute top-0 right-0 p-4 opacity-20"><i data-lucide="banknote" class="w-16 h-16"></i></div>
-                    <p class="text-xs uppercase tracking-widest text-yellow-500/80 mb-2">Maior Investidor</p>
-                    <div class="flex items-center gap-4 mt-8">
-                        <!-- Adicionado object-cover -->
-                        <div class="w-16 h-16 rounded-full border-2 border-yellow-500 overflow-hidden">
-                            <img id="sponsorPhoto" src="" class="w-full h-full object-cover object-center">
-                        </div>
-                        <div>
-                            <p class="text-xl font-bold text-white leading-none" id="sponsorName">--</p>
-                            <p class="text-2xl font-mono font-bold text-yellow-400 mt-1" id="sponsorValue">R$ 0,00</p>
-                        </div>
+                    <p class="text-xs uppercase tracking-widest text-yellow-500/80 mb-4 absolute top-5 left-5">Maior Investidor</p>
+
+                    <div class="w-32 h-32 rounded-full border-4 border-yellow-500 overflow-hidden shadow-[0_0_20px_rgba(251,191,36,0.5)] mb-4 transition-transform duration-300 group-hover:scale-105">
+                        <img id="sponsorPhoto" src="" class="w-full h-full object-cover object-center">
                     </div>
-                    <p class="text-[10px] text-yellow-500/60 mt-4 italic absolute bottom-4 left-5">"A festa é por conta dele(a)."</p>
+
+                    <div>
+                        <p class="text-2xl font-bold text-white leading-none mb-2" id="sponsorName">--</p>
+                        <p class="text-3xl font-mono font-bold text-yellow-400" id="sponsorValue">R$ 0,00</p>
+                    </div>
+                    <p class="text-[10px] text-yellow-500/60 italic absolute bottom-4 left-0 right-0 text-center">"A festa é por conta dele(a)."</p>
                 </div>
 
                 <!-- 2. MAIOR INFRATOR (Quantidade) -->
-                <div class="chaos-card rounded-xl p-5 relative overflow-hidden h-80">
+                <div class="chaos-card rounded-xl p-5 relative overflow-hidden h-80 flex flex-col items-center justify-center text-center group">
                     <div class="absolute top-0 right-0 p-4 opacity-20"><i data-lucide="zap" class="w-16 h-16"></i></div>
-                    <p class="text-xs uppercase tracking-widest text-red-200 mb-2">Rei do Caos</p>
-                    <div class="flex items-center gap-4 mt-8">
-                        <!-- Adicionado object-cover -->
-                        <div class="w-16 h-16 rounded-full border-2 border-red-300 overflow-hidden grayscale">
-                            <img id="chaosPhoto" src="" class="w-full h-full object-cover object-center">
-                        </div>
-                        <div>
-                            <p class="text-xl font-bold text-white leading-none" id="chaosName">--</p>
-                            <p class="text-2xl font-mono font-bold text-red-200 mt-1" id="chaosCount">0x</p>
-                        </div>
+                    <p class="text-xs uppercase tracking-widest text-red-200 mb-4 absolute top-5 left-5">Rei do Caos</p>
+
+                    <div class="w-32 h-32 rounded-full border-4 border-red-300 overflow-hidden shadow-[0_0_20px_rgba(239,68,68,0.5)] mb-4 transition-transform duration-300 group-hover:scale-105">
+                        <img id="chaosPhoto" src="" class="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-300">
                     </div>
-                    <p class="text-[10px] text-red-200/60 mt-4 italic absolute bottom-4 left-5">"Não consegue seguir uma regra."</p>
+
+                    <div>
+                        <p class="text-2xl font-bold text-white leading-none mb-2" id="chaosName">--</p>
+                        <p class="text-3xl font-mono font-bold text-red-200" id="chaosCount">0x</p>
+                    </div>
+                    <p class="text-[10px] text-red-200/60 italic absolute bottom-4 left-0 right-0 text-center">"Não consegue seguir uma regra."</p>
                 </div>
 
                 <!-- 3. PEGO EM FLAGRANTE (CCTV) - CAIO -->
@@ -319,25 +317,24 @@
                 </div>
     
                 <!-- CARD "O MINIMALISTA" -->
-                <div class="bg-gray-100 rounded-xl border border-gray-300 p-4 relative overflow-hidden">
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-16 h-16 rounded-full bg-gray-300 overflow-hidden grayscale opacity-80 border-2 border-gray-400">
-                            <img id="goodCitizenPhoto" src="" class="w-full h-full object-cover object-center">
-                        </div>
-                        <div>
-                            <p class="font-bold text-gray-700 text-lg leading-none" id="goodCitizenName">--</p>
-                            <span class="bg-gray-200 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border border-gray-300 mt-1 inline-block">Fez o Mínimo</span>
-                        </div>
+                <div class="bg-gray-100 rounded-xl border border-gray-300 p-6 relative overflow-hidden flex flex-col items-center text-center">
+                    <div class="w-24 h-24 rounded-full bg-gray-300 overflow-hidden border-4 border-gray-400 mb-3 shadow-md group">
+                        <img id="goodCitizenPhoto" src="" class="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-500">
+                    </div>
+
+                    <div>
+                        <p class="font-bold text-gray-700 text-xl leading-none" id="goodCitizenName">--</p>
+                        <span class="bg-gray-200 text-gray-500 text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-gray-300 mt-2 inline-block">Fez o Mínimo</span>
                     </div>
                     
-                    <p class="text-xs text-gray-500 italic mb-4 px-1">"Obrigado por não ajudar em nada nosso almoço."</p>
+                    <p class="text-xs text-gray-500 italic my-4 px-1">"Obrigado por não ajudar em nada nosso almoço."</p>
                     
-                    <div class="flex justify-between items-center border-t border-gray-200 pt-3">
-                        <div class="text-center">
+                    <div class="flex justify-between items-center border-t border-gray-200 pt-3 w-full">
+                        <div class="text-center w-1/2 border-r border-gray-200">
                             <p class="text-[10px] text-gray-400 uppercase font-bold">Infrações</p>
                             <p class="font-bold text-gray-600 text-lg leading-none" id="goodCitizenCount">0</p>
                         </div>
-                        <div class="text-center">
+                        <div class="text-center w-1/2">
                             <p class="text-[10px] text-gray-400 uppercase font-bold">Contribuição</p>
                             <p class="font-bold text-gray-600 text-lg leading-none" id="goodCitizenValue">R$ 0,00</p>
                         </div>
