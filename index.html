@@ -260,7 +260,7 @@
                 </div>
 
                 <!-- 3. PEGO EM FLAGRANTE (CCTV) - CAIO -->
-                <div class="bg-black rounded-xl p-0 relative overflow-hidden border-4 border-gray-800 shadow-2xl col-span-1 h-64 group cctv-container">
+                <div style="height: 400px;" class="bg-black rounded-xl p-0 relative overflow-hidden border-4 border-gray-800 shadow-2xl col-span-1 h-64 group cctv-container">
                     <div class="cctv-scanlines z-20"></div>
                     <div class="cctv-overlay"></div>
                     
@@ -310,7 +310,7 @@
             <!-- TOP 3 (O PÓDIO) -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="font-black text-gray-800 text-xl mb-4 flex items-center gap-2 uppercase tracking-wide">
-                    <i data-lucide="trophy" class="text-yellow-500"></i> Top 3 Infratores
+                    <i data-lucide="trophy" class="text-yellow-500"></i> Top 3 Comtribuidores
                 </h3>
                 <div class="space-y-3" id="top3List">
                     <!-- Injected via JS -->
@@ -530,7 +530,7 @@
         
         document.getElementById('flagranteName').innerText = "CAIO";
         document.getElementById('flagranteDesc').innerText = flagranteGuy.desc.length > 50 ? flagranteGuy.desc.substring(0,50)+'...' : flagranteGuy.desc;
-        document.getElementById('flagrantePhoto').src = getPhotoUrl("Caio");
+        document.getElementById('flagrantePhoto').src = './imagens/pego.jpg';
 
         // 4. Engraçadinho (LUCAS)
         // Forçando o Lucas conforme pedido
@@ -539,7 +539,7 @@
         document.getElementById('funnyName').innerText = "LUCAS";
         document.getElementById('funnyDesc').innerText = funnyGuy.desc.length > 40 ? funnyGuy.desc.substring(0,40)+'...' : funnyGuy.desc;
         document.getElementById('funnyValue').innerText = funnyGuy.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        document.getElementById('funnyPhoto').src = getPhotoUrl("Lucas");
+        document.getElementById('funnyPhoto').src = './imagens/engracadinho.jpg';
 
 
         // Minimalist
