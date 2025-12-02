@@ -150,7 +150,7 @@
             </h1>
             <p class="text-gray-500 text-sm mt-1 uppercase tracking-widest font-mono">Painel de Controle de Infrações</p>
         </div>
-        <div class="mt-4 md:mt-0 flex gap-4 text-right">
+        <div class="mt-4 md:mt-0 flex gap-4 text-center md:text-right">
              <div>
                 <p class="text-[10px] text-gray-400 uppercase font-bold">Total Ocorrências</p>
                 <p class="text-2xl font-bold text-gray-700 font-mono" id="totalCount">0</p>
@@ -226,7 +226,7 @@
             <!-- GRADE DE DESTAQUES (2x2) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 1. MAIOR PAGADOR (Sponsor) -->
-                <div class="sponsor-card rounded-xl p-5 relative overflow-hidden group h-64">
+                <div class="sponsor-card rounded-xl p-5 relative overflow-hidden group h-80">
                     <div class="absolute top-0 right-0 p-4 opacity-20"><i data-lucide="banknote" class="w-16 h-16"></i></div>
                     <p class="text-xs uppercase tracking-widest text-yellow-500/80 mb-2">Maior Investidor</p>
                     <div class="flex items-center gap-4 mt-8">
@@ -243,7 +243,7 @@
                 </div>
 
                 <!-- 2. MAIOR INFRATOR (Quantidade) -->
-                <div class="chaos-card rounded-xl p-5 relative overflow-hidden h-64">
+                <div class="chaos-card rounded-xl p-5 relative overflow-hidden h-80">
                     <div class="absolute top-0 right-0 p-4 opacity-20"><i data-lucide="zap" class="w-16 h-16"></i></div>
                     <p class="text-xs uppercase tracking-widest text-red-200 mb-2">Rei do Caos</p>
                     <div class="flex items-center gap-4 mt-8">
@@ -260,7 +260,7 @@
                 </div>
 
                 <!-- 3. PEGO EM FLAGRANTE (CCTV) - CAIO -->
-                <div style="height: 600px;" class="bg-black rounded-xl p-0 relative overflow-hidden border-4 border-gray-800 shadow-2xl col-span-1 h-64 group cctv-container">
+                <div class="bg-black rounded-xl p-0 relative overflow-hidden border-4 border-gray-800 shadow-2xl col-span-1 h-80 group cctv-container">
                     <div class="cctv-scanlines z-20"></div>
                     <div class="cctv-overlay"></div>
                     
@@ -281,7 +281,7 @@
                 </div>
 
                 <!-- 4. ENGRAÇADINHO PORÉM MULTADO - LUCAS -->
-                <div style="height: 600px;" class="bg-indigo-900 rounded-xl p-0 relative overflow-hidden border-4 border-indigo-400 shadow-2xl col-span-1 h-64 group">
+                <div class="bg-indigo-900 rounded-xl p-0 relative overflow-hidden border-4 border-indigo-400 shadow-2xl col-span-1 h-80 group">
                     <div class="absolute inset-0 bg-indigo-900/30 z-10 group-hover:bg-transparent transition-colors"></div>
                     
                     <!-- FOTO DO LUCAS GRANDE - Adicionado object-cover -->
@@ -307,7 +307,7 @@
                 </div>
             </div>
 
-            <div class="flex w-full h-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 <!-- TOP 3 (O PÓDIO) -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                     <h3 class="font-black text-gray-800 text-xl mb-4 flex items-center gap-2 uppercase tracking-wide">
@@ -430,7 +430,7 @@
         // --- APELIDOS ---
         const crimeProfiles = {
             "Deixar Sujeira": { 
-                alias: "O SENHOR DOS CANECOS", 
+                alias: "O REI DA SUJEIRA",
                 stamp: "BORRA TÓXICA", 
                 desc: "Esquece xícaras de café criando vida própria na mesa. A pia treme quando ele passa." 
             },
