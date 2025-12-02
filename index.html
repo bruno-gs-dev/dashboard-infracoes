@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Infrações</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Special+Elite&family=Cinzel:wght@600&family=Black+Ops+One&family=Permanent+Marker&family=Playfair+Display:ital,wght@1,700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb;
+        }
+
+        /* --- ESTILOS VISUAIS --- */
+        .wanted-paper {
+            font-family: 'Special Elite', cursive;
+            background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            background-color: #fdfbf7;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        .wanted-paper:hover { transform: scale(1.02); z-index: 20; }
+        
+        .sponsor-card {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #fbbf24;
+            font-family: 'Playfair Display', serif;
+            border: 1px solid #fbbf24;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        }
+
+        .chaos-card {
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+            color: #fff;
+            border: 1px solid #fca5a5;
+        }
+
+        .shame-stamp {
+            font-family: 'Black Ops One', system-ui;
+            color: #dc2626; 
+            border: 3px solid #dc2626;
+            text-transform: uppercase;
+            padding: 0.2rem 1rem;
+            position: absolute;
+            opacity: 0.85;
+            mix-blend-mode: multiply;
+            font-size: 1.2rem;
+            pointer-events: none;
+            transform: rotate(-10deg);
+            z-index: 20;
+            mask-image: url('https://www.transparenttextures.com/patterns/dust.png');
+        }
+
+        .mugshot { filter: grayscale(100%) contrast(120%) sepia(30%); mix-blend-mode: multiply; }
+
+        /* KPI Cards */
+        .kpi-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        /* Top 3 List Style */
+        .rank-row { transition: all 0.2s; }
+        .rank-row:hover { background-color: #fef3c7; transform: translateX(5px); }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+    <!-- Header -->
+    <header class="mb-6 flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-xl shadow-md border-t-8 border-gray-800">
+        <div>
+            <h1 class="text-3xl font-black text-gray-800 flex items-center gap-3 tracking-tighter">
+                <i data-lucide="gavel" class="text-gray-800 w-8 h-8"></i>
+                TRIBUNAL DA BOLACHA
+            </h1>
+            <p class="text-gray-500 text-sm mt-1 uppercase tracking-widest font-mono">Painel de Controle de Infrações</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex gap-4 text-right">
+             <div>
+                <p class="text-[10px] text-gray-400 uppercase font-bold">Total Ocorrências</p>
+                <p class="text-2xl font-bold text-gray-700 font-mono" id="totalCount">0</p>
+            </div>
+            <div>
+                <p class="text-[10px] text-gray-400 uppercase font-bold">Caixa da Festa</p>
+                <p class="text-4xl font-bold text-green-600 font-mono" id="totalMoney">R$ 0,00</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- NOVOS INDICADORES (KPIs) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="kpi-card border-blue-500">
+            <p class="text-xs text-gray-500 font-bold uppercase">Multa Média</p>
+            <p class="text-xl font-bold text-gray-800 mt-1" id="avgTicket">R$ 0,00</p>
+            <i data-lucide="calculator" class="w-4 h-4 text-gray-300 absolute top-4 right-4"></i>
+        </div>
+        <div class="kpi-card border-red-500">
+            <p class="text-xs text-gray-500 font-bold uppercase">Dia do Caos</p>
+            <p class="text-lg font-bold text-gray-800 mt-1 truncate" id="busiestDay">--</p>
+             <p class="text-[10px] text-gray-400">Dia com mais infrações</p>
+        </div>
+        <div class="kpi-card border-orange-500">
+            <p class="text-xs text-gray-500 font-bold uppercase">Crime da Moda</p>
+            <p class="text-sm font-bold text-gray-800 mt-1 leading-tight" id="topCrimeType">--</p>
+        </div>
+        <div class="kpi-card border-green-500">
+            <p class="text-xs text-gray-500 font-bold uppercase">Plantão Atual</p>
+            <p class="text-sm font-bold text-gray-800 mt-1" id="currentRosterNames">--</p>
+            <p class="text-[10px] text-gray-400" id="currentRosterDate">--</p>
+        </div>
+    </div>
+
+    <!-- ÁREA PRINCIPAL -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- COLUNA ESQUERDA: O GRANDE VILÃO (WANTED) -->
+        <div class="lg:col-span-4">
+             <div class="wanted-paper p-6 text-center border-4 border-gray-900 transform rotate-[-1deg]">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-red-700 text-white px-6 py-2 text-xl font-bold tracking-widest uppercase shadow-lg z-20">
+                    INIMIGO Nº 1
+                </div>
+                
+                <h2 class="text-6xl font-bold text-gray-900 mt-8 mb-4 tracking-tighter">WANTED</h2>
+                
+                <div class="relative w-56 h-56 mx-auto mb-6">
+                    <div id="wantedStamp" class="shame-stamp top-4 -right-4 rotate-12 text-xl border-4">PERIGO</div>
+                    <div class="w-full h-full bg-gray-200 border-4 border-gray-900 p-1 bg-[url('https://www.transparenttextures.com/patterns/lined-paper.png')]">
+                        <img id="wantedPhoto" src="" class="w-full h-full object-cover mugshot">
+                    </div>
+                </div>
+
+                <h3 class="text-4xl font-bold text-gray-900 uppercase underline decoration-4 decoration-red-800 mb-1" id="wantedName">--</h3>
+                <p class="text-lg font-bold text-red-700 uppercase tracking-widest font-mono" id="wantedAlias">"O VILÃO"</p>
+                
+                <div class="mt-6 text-left bg-yellow-50/50 p-4 border border-dashed border-gray-600">
+                    <p class="font-bold text-gray-800 text-sm mb-1 uppercase border-b border-gray-400 pb-1">Perfil:</p>
+                    <p class="text-gray-700 italic leading-snug text-sm" id="wantedDesc">--</p>
+                </div>
+
+                <div class="mt-4 pt-4 border-t-2 border-gray-900 flex justify-between items-center">
+                    <span class="text-xs font-bold text-gray-500 uppercase">Recompensa:</span>
+                    <span class="text-2xl font-bold text-red-700 font-mono" id="wantedDebt">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA CENTRAL/DIREITA -->
+        <div class="lg:col-span-8 flex flex-col gap-8">
+            
+            <!-- COMPARATIVO: QUEM PAGA MAIS vs QUEM ERRA MAIS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- MAIOR PAGADOR (Sponsor) -->
+                <div class="sponsor-card rounded-xl p-5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-20"><i data-lucide="banknote" class="w-16 h-16"></i></div>
+                    <p class="text-xs uppercase tracking-widest text-yellow-500/80 mb-2">Maior Investidor (Valor R$)</p>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full border-2 border-yellow-500 overflow-hidden">
+                            <img id="sponsorPhoto" src="" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-white leading-none" id="sponsorName">--</p>
+                            <p class="text-3xl font-mono font-bold text-yellow-400 mt-1" id="sponsorValue">R$ 0,00</p>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-yellow-500/60 mt-4 italic">"A festa é por conta dele(a)."</p>
+                </div>
+
+                <!-- MAIOR INFRATOR (Quantidade) -->
+                <div class="chaos-card rounded-xl p-5 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-20"><i data-lucide="zap" class="w-16 h-16"></i></div>
+                    <p class="text-xs uppercase tracking-widest text-red-200 mb-2">Rei do Caos (Quantidade)</p>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full border-2 border-red-300 overflow-hidden grayscale">
+                            <img id="chaosPhoto" src="" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-white leading-none" id="chaosName">--</p>
+                            <p class="text-3xl font-mono font-bold text-red-200 mt-1" id="chaosCount">0 <span class="text-sm">infrações</span></p>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-red-200/60 mt-4 italic">"Não consegue seguir uma regra."</p>
+                </div>
+            </div>
+
+            <!-- TOP 3 (O PÓDIO) -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="font-black text-gray-800 text-xl mb-4 flex items-center gap-2 uppercase tracking-wide">
+                    <i data-lucide="trophy" class="text-yellow-500"></i> Top 3 Infratores
+                </h3>
+                <div class="space-y-3" id="top3List">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- CARD "O MINIMALISTA" -->
+            <div class="bg-gray-100 rounded-xl border border-gray-300 p-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gray-300 overflow-hidden grayscale opacity-70">
+                        <img id="goodCitizenPhoto" src="" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-600" id="goodCitizenName">--</p>
+                        <span class="bg-gray-200 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border border-gray-300">Fez o Mínimo</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-400 italic">"Obrigado por não ajudar."</p>
+                    <p class="font-bold text-gray-500" id="goodCitizenValue">R$ 0,00</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- GRÁFICOS E GALERIA -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div class="bg-white p-6 rounded-xl shadow-sm">
+            <h4 class="font-bold text-gray-700 mb-4">Ranking Completo (Dívida)</h4>
+            <div class="h-64"><canvas id="chartMoney"></canvas></div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-sm">
+             <h4 class="font-bold text-gray-700 mb-4">Tipos de Infração</h4>
+            <div class="h-64 flex justify-center"><canvas id="chartTypes"></canvas></div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // --- DADOS ---
+        const rawData = [
+            { id: 1, data: '2025-09-02', infrator: 'Gustavo', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 2.00 },
+            { id: 2, data: '2025-09-02', infrator: 'Nivaldo', desc: '*** DESORGANIZAR A MESA DE TERCEIROS', valor: 2.00 },
+            { id: 3, data: '2025-09-02', infrator: 'Bruno', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 2.00 },
+            { id: 4, data: '2025-09-09', infrator: 'Caio', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 2.00 },
+            { id: 5, data: '2025-09-18', infrator: 'Elvis', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 2.00 },
+            { id: 6, data: '2025-09-18', infrator: 'Lucas', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 2.00 },
+            { id: 7, data: '2025-09-22', infrator: 'Lucas', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 2.00 },
+            { id: 8, data: '2025-09-29', infrator: 'Tatiana', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 5.00 },
+            { id: 9, data: '2025-09-29', infrator: 'Melqui', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 5.00 },
+            { id: 10, data: '2025-10-03', infrator: 'Lucas', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 2.00 },
+            { id: 11, data: '2025-10-08', infrator: 'Caio', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 2.00 },
+            { id: 12, data: '2025-10-08', infrator: 'Nivaldo', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 2.00 },
+            { id: 13, data: '2025-10-09', infrator: 'Gustavo', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 2.00 },
+            { id: 14, data: '2025-10-10', infrator: 'Melqui', desc: '*** DESORGANIZAR A MESA DE TERCEIROS', valor: 2.00 },
+            { id: 15, data: '2025-10-10', infrator: 'Tatiana', desc: '*** DESORGANIZAR A MESA DE TERCEIROS', valor: 2.00 },
+            { id: 16, data: '2025-10-14', infrator: 'Gustavo', desc: 'NÃO INVENTAR REGRAS NOVAS', valor: 10.00 },
+            { id: 17, data: '2025-10-14', infrator: 'Nivaldo', desc: '*** DESORGANIZAR A MESA DE TERCEIROS', valor: 2.00 },
+            { id: 18, data: '2025-10-27', infrator: 'Lucas', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 2.00 },
+            { id: 19, data: '2025-10-23', infrator: 'Gustavo', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 },
+            { id: 20, data: '2025-10-29', infrator: 'Nivaldo', desc: '*** DESORGANIZAR A MESA DE TERCEIROS', valor: 2.00 },
+            { id: 21, data: '2025-10-31', infrator: 'Caio', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 2.00 },
+            { id: 22, data: '2025-10-31', infrator: 'Tatiana', desc: 'ENCOBRIR OU AJUDAR UM COLEGA QUE RECEBEU UMA INFRAÇÃO', valor: 10.00 },
+            { id: 23, data: '2025-11-04', infrator: 'Melqui', desc: '*** DESORGANIZAR A MESA DE TERCEIROS', valor: 2.00 },
+            { id: 24, data: '2025-11-07', infrator: 'Gustavo', desc: 'NÃO TRAZER BOLACHA', valor: 5.00 },
+            { id: 25, data: '2025-11-12', infrator: 'Elvis', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 1.00 },
+            { id: 26, data: '2025-11-12', infrator: 'Bruno', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 1.00 },
+            { id: 27, data: '2025-11-12', infrator: 'Caio', desc: 'REMOVER E OU DESORGANIZAR A MESA/OBJETOS DE TERCEIROS', valor: 2.00 },
+            { id: 28, data: '2025-11-12', infrator: 'Caio', desc: 'REMOVER E OU DESORGANIZAR A MESA/OBJETOS DE TERCEIROS', valor: 2.00 },
+            { id: 29, data: '2025-11-12', infrator: 'Elvis', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 },
+            { id: 30, data: '2025-11-12', infrator: 'Bruno', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 },
+            { id: 31, data: '2025-11-12', infrator: 'Melqui', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 },
+            { id: 32, data: '2025-11-13', infrator: 'Gustavo', desc: 'NÃO TRAZER BOLACHA', valor: 10.00 },
+            { id: 33, data: '2025-11-17', infrator: 'Lucas', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 },
+            { id: 34, data: '2025-11-19', infrator: 'Caio', desc: 'VISITA: SUBIR QUANDO PODERIA SER UM E-MAIL/WHATSAPP', valor: 2.00 },
+            { id: 35, data: '2025-11-19', infrator: 'Caio', desc: 'ACUSAR O COLEGA DE INFRAÇÃO INEXISTENTE', valor: 10.00 },
+            { id: 36, data: '2025-12-01', infrator: 'Nivaldo', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 },
+            { id: 37, data: '2025-12-01', infrator: 'Bruno', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 },
+            { id: 38, data: '2025-12-01', infrator: 'Lucas', desc: 'DEIXAR RESTOS DE COMIDA, SUJEIRA, SOBRE A MESA E OU OBJETOS', valor: 6.00 }
+        ];
+
+        const rosterData = [
+            { period: '24/11 - 28/11', names: 'Bruno e Elvis', status: 'OK' },
+            { period: '01/12 - 05/12', names: 'Caio e Tatiana', status: 'Falta Tatiana' },
+            { period: '08/12 - 12/12', names: 'Nivaldo e Melqui', status: '' },
+        ];
+
+        // --- APELIDOS ---
+        const crimeProfiles = {
+            "Deixar Sujeira": { alias: "O BARÃO DO FARELO", stamp: "RISCO BIOLÓGICO", desc: "Transforma mesas em zonas de desastre." },
+            "Esquecer Bolacha": { alias: "INIMIGO DO TRIGO", stamp: "FOME ZERO", desc: "Abala a moral da equipe ao negar alimento." },
+            "Visita Desnecessária": { alias: "EMBAIXADOR DO ÓCIO", stamp: "DISTRADOR", desc: "Interrompe fluxos de trabalho cruciais." },
+            "Desorganização": { alias: "FURACÃO 2000", stamp: "BADERNA", desc: "Especialista em entropia corporativa." },
+            "Cúmplice": { alias: "O SOMBRA", stamp: "CONSPIRADOR", desc: "Tão culpado quanto quem roubou a bolacha." },
+            "Falsa Acusação": { alias: "FALSO PROFETA", stamp: "X-9 FAKE", desc: "Aponta dedos sujos para inocentes." },
+            "Inventar Regras": { alias: "O DITADOR", stamp: "ILEGAL", desc: "Tenta reescrever a Constituição da Bolacha." }
+        };
+
+        const photoMap = { 'Gustavo': '', 'Caio': '', 'Nivaldo': '', 'Bruno': '', 'Elvis': '', 'Lucas': '', 'Melqui': '', 'Tatiana': '' };
+        function getPhotoUrl(name) { return photoMap[name] || `https://i.pravatar.cc/300?u=${encodeURIComponent(name)}`; }
+
+        // --- PROCESSAMENTO ---
+        const stats = { byPerson: {}, byType: {}, byDay: {}, totalMoney: 0, totalCount: rawData.length };
+
+        rawData.forEach(item => {
+            if (!stats.byPerson[item.infrator]) stats.byPerson[item.infrator] = { name: item.infrator, totalValue: 0, count: 0, crimes: [] };
+            stats.byPerson[item.infrator].totalValue += item.valor;
+            stats.byPerson[item.infrator].count += 1;
+            
+            let shortDesc = item.desc;
+            if(item.desc.includes("BOLACHA")) shortDesc = "Esquecer Bolacha";
+            else if(item.desc.includes("SUJEIRA")) shortDesc = "Deixar Sujeira";
+            else if(item.desc.includes("DESORGANIZAR") || item.desc.includes("REMOVER")) shortDesc = "Desorganização";
+            else if(item.desc.includes("VISITA")) shortDesc = "Visita Desnecessária";
+            else if(item.desc.includes("ENCOBRIR")) shortDesc = "Cúmplice";
+            else if(item.desc.includes("ACUSAR")) shortDesc = "Falsa Acusação";
+            else if(item.desc.includes("INVENTAR")) shortDesc = "Inventar Regras";
+            
+            stats.byPerson[item.infrator].crimes.push(shortDesc);
+            stats.byType[shortDesc] = (stats.byType[shortDesc] || 0) + 1;
+            stats.totalMoney += item.valor;
+
+            // Day of week
+            const date = new Date(item.data);
+            const dayName = date.toLocaleDateString('pt-BR', { weekday: 'long' });
+            stats.byDay[dayName] = (stats.byDay[dayName] || 0) + 1;
+        });
+
+        const peopleArray = Object.values(stats.byPerson);
+        const sortedByValue = [...peopleArray].sort((a, b) => b.totalValue - a.totalValue);
+        const sortedByCount = [...peopleArray].sort((a, b) => b.count - a.count);
+        const sortedRules = Object.entries(stats.byType).sort((a, b) => b[1] - a[1]);
+        const sortedDays = Object.entries(stats.byDay).sort((a, b) => b[1] - a[1]);
+
+        // --- RENDER KPI ---
+        document.getElementById('totalCount').innerText = stats.totalCount;
+        document.getElementById('totalMoney').innerText = stats.totalMoney.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('avgTicket').innerText = (stats.totalMoney / stats.totalCount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('busiestDay').innerText = sortedDays[0][0].charAt(0).toUpperCase() + sortedDays[0][0].slice(1);
+        document.getElementById('topCrimeType').innerText = sortedRules[0][0];
+
+        const currentRoster = rosterData.find(r => r.period === '01/12 - 05/12') || rosterData[0];
+        document.getElementById('currentRosterNames').innerText = currentRoster.names;
+        document.getElementById('currentRosterDate').innerText = currentRoster.period;
+
+        // --- RENDER WANTED (Top 1 Value) ---
+        const topDebtor = sortedByValue[0];
+        const crimeCounts = {};
+        topDebtor.crimes.forEach(c => crimeCounts[c] = (crimeCounts[c] || 0) + 1);
+        const topCrime = Object.entries(crimeCounts).sort((a, b) => b[1] - a[1])[0][0];
+        const profile = crimeProfiles[topCrime] || { alias: "O MISTÉRIO", stamp: "SUSPEITO", desc: "Crimes variados." };
+
+        document.getElementById('wantedName').innerText = topDebtor.name;
+        document.getElementById('wantedDebt').innerText = topDebtor.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('wantedPhoto').src = getPhotoUrl(topDebtor.name);
+        document.getElementById('wantedAlias').innerText = `"${profile.alias}"`;
+        document.getElementById('wantedDesc').innerText = profile.desc;
+        document.getElementById('wantedStamp').innerText = profile.stamp;
+
+        // --- RENDER COMPARISON ---
+        // Sponsor (Value)
+        document.getElementById('sponsorName').innerText = topDebtor.name;
+        document.getElementById('sponsorValue').innerText = topDebtor.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('sponsorPhoto').src = getPhotoUrl(topDebtor.name);
+
+        // Chaos (Count)
+        const topChaos = sortedByCount[0];
+        document.getElementById('chaosName').innerText = topChaos.name;
+        document.getElementById('chaosCount').innerHTML = `${topChaos.count} <span class="text-sm">infrações</span>`;
+        document.getElementById('chaosPhoto').src = getPhotoUrl(topChaos.name);
+
+        // Minimalist
+        const goodCitizen = [...peopleArray].sort((a, b) => a.count - b.count || a.totalValue - b.totalValue)[0];
+        document.getElementById('goodCitizenName').innerText = goodCitizen.name;
+        document.getElementById('goodCitizenValue').innerText = goodCitizen.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('goodCitizenPhoto').src = getPhotoUrl(goodCitizen.name);
+
+        // --- RENDER TOP 3 ---
+        const top3List = document.getElementById('top3List');
+        sortedByValue.slice(0, 3).forEach((p, i) => {
+            const colors = ['bg-yellow-100 border-yellow-300', 'bg-gray-100 border-gray-300', 'bg-orange-100 border-orange-200'];
+            const medals = ['🥇', '🥈', '🥉'];
+            
+            top3List.innerHTML += `
+                <div class="flex items-center justify-between p-3 rounded-lg border ${colors[i]} rank-row">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${medals[i]}</span>
+                        <img src="${getPhotoUrl(p.name)}" class="w-10 h-10 rounded-full object-cover">
+                        <div>
+                            <p class="font-bold text-gray-800 leading-none">${p.name}</p>
+                            <p class="text-[10px] text-gray-500 uppercase">${p.count} infrações</p>
+                        </div>
+                    </div>
+                    <p class="font-mono font-bold text-gray-700">${p.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                </div>
+            `;
+        });
+
+        // --- CHARTS ---
+        new Chart(document.getElementById('chartMoney'), {
+            type: 'bar',
+            data: {
+                labels: sortedByValue.map(p => p.name),
+                datasets: [{ label: 'R$', data: sortedByValue.map(p => p.totalValue), backgroundColor: '#1f2937', borderRadius: 4 }]
+            },
+            options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } }
+        });
+
+        new Chart(document.getElementById('chartTypes'), {
+            type: 'doughnut',
+            data: {
+                labels: sortedRules.map(r => r[0]),
+                datasets: [{ data: sortedRules.map(r => r[1]), backgroundColor: ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'], borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10 } } }, cutout: '65%' }
+        });
+
+    </script>
+</body>
+</html>
