@@ -548,6 +548,7 @@
         const goodCitizen = [...peopleArray].sort((a, b) => a.count - b.count || a.totalValue - b.totalValue)[0];
         document.getElementById('goodCitizenName').innerText = goodCitizen.name;
         document.getElementById('goodCitizenValue').innerText = goodCitizen.totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('goodCitizenCount').innerText = goodCitizen.count;
         document.getElementById('goodCitizenPhoto').src = getPhotoUrl(goodCitizen.name);
 
         // --- RENDER TOP 3 ---
